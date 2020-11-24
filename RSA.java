@@ -1,23 +1,32 @@
 
 import javax.swing.*;
-import java.awt.event.*;  
+import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.Scanner;
 
 
-public class RSA implements ActionListener {
+public class RSA {
     public String name;
     public long kpub;
     private long kpr;
 
-    // Graficos
-    JFrame f;
-    JTextField tf1, tf2, tf3;
-    JButton b1, b2;
-    //
 
     public RSA(String name) {
         this.name = name;
-        int p = 11;
-        int q = 3;
+        int p = 97;
+        int q = 89;
         int n = p * q;
         int phi = (p - 1) * (q - 1);
 
@@ -30,35 +39,14 @@ public class RSA implements ActionListener {
         }
         // System.out.println(e%phi);
         int d = modInverse(e, phi);
+        //System.out.println(modInverse(a, m));
         // System.out.println(d);
 
-        // Graficos
-        // JTextField tf1, tf2, tf3;
-        // JButton b1, b2;
-
-        this.f = new JFrame();
-        tf1 = new JTextField();
-        tf1.setBounds(50, 50, 150, 20);
-        tf2 = new JTextField();
-        tf2.setBounds(50, 100, 150, 20);
-        tf3 = new JTextField();
-        tf3.setBounds(50, 150, 150, 20);
-        tf3.setEditable(false);
-        b1 = new JButton("FC");
-        b1.setBounds(50, 200, 50, 50);
-        b2 = new JButton("-");
-        b2.setBounds(150, 200, 50, 50);
-        b1.addActionListener(this);
-        b2.addActionListener(this);
-        f.add(tf1);
-        f.add(tf2);
-        f.add(tf3);
-        f.add(b1);
-        f.add(b2);
-        f.setSize(500, 500);
-        f.setLayout(null);
-        f.setVisible(true);
-        //
+        // System.out.print("Que archivo desea leer? ");
+        // Scanner in = new Scanner(System.in); 
+        // String s = in.nextLine(); 
+        //String archivo = reader.readLine();
+        System.out.println("n" + n + " e " + e + " d " +d);
     }
 
     public static int modInverse(int a, int m) {
@@ -85,6 +73,132 @@ public class RSA implements ActionListener {
         return x;
     }
 
+    public static void encriptacion(int n, int e, String doc){
+        //System.out.println("hola");
+        try{
+            PrintWriter writer = new PrintWriter("encryp", "UTF-8");
+            BufferedReader br=new BufferedReader(new FileReader(doc));
+            String linea=br.readLine();
+            String[] message;
+            while (linea!=null){
+                System.out.println(linea);
+                message=linea.split("");
+                String encryp = "";
+                for(int i = 0; i<message.length; i++){
+                    //System.out.println(message[i]);
+                    int x = (int)message[i].charAt(0);
+                    int y = (int)(Math.pow(x, e)%n);
+                    System.out.println("encifer: " + message[i] + "  x: " + x + " y: " + y);
+                    encryp = encryp + y + " ";
+                }
+                writer.println(encryp);
+                linea=br.readLine();
+                System.out.println();
+            }
+            br.close();
+            writer.close();
+
+            //////// editar documento
+            Writer a = new FileWriter(doc, false);
+            BufferedReader br2=new BufferedReader(new FileReader("encryp"));
+            String linea2=br2.readLine();
+            while (linea2!=null){
+                a.append(linea2);
+                //System.out.println(linea2);
+                linea2=br2.readLine();
+
+            }
+            br2.close();
+            a.close();
+            System.out.println("Encriptado");
+            
+            File delTemp = new File("encryp");
+            delTemp.delete();
+
+
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } 
+    }
+
+    public static void desencriptacion(int d, int n, String doc){
+        try{
+            PrintWriter writer = new PrintWriter("descifraTemp.txt", "UTF-8");
+            
+            BufferedReader br=new BufferedReader(new FileReader(doc));
+            String linea=br.readLine();
+            String[] message;
+            while (linea!=null){
+                message=linea.split(" ");
+                String descifraTemp = "";
+                for(int i = 0; i<message.length; i++){
+                    
+                    BigInteger y = new BigInteger(message[i]);
+                    y = y.modPow(new BigInteger(String.valueOf(d)), new BigInteger(String.valueOf(n)));
+                    descifraTemp = descifraTemp + (char)(Integer.parseInt(y.toString()));
+                }
+                writer.println(descifraTemp);
+                linea=br.readLine();
+
+            }
+            //System.out.println(libreria.toString());
+            br.close();
+            writer.close();
+
+            //////
+
+            //////// editar documento
+            // Writer a = new FileWriter(doc, false);
+            // BufferedReader br2=new BufferedReader(new FileReader("descifraTemp"));
+            // String linea2=br2.readLine();
+            // while (linea2!=null){
+            //     a.append(linea2);
+            //     //System.out.println(linea2);
+            //     linea2=br2.readLine();
+
+            // }
+            // br2.close();
+            // a.close();
+            // System.out.println("Desencriptado");
+            
+            // File delTemp = new File("descifraTemp");
+            // delTemp.delete();
+            
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static BigInteger exponen(BigInteger x, int d, int n){
+        BigInteger di = new BigInteger(String.valueOf(d));
+        String[] binary = di.toString(2).split("");
+        int[] binExpo = new int[binary.length];
+        
+        for(int i = 0; i<binExpo.length; i++){
+            binExpo[i] = Integer.parseInt(binary[i]);
+        }
+        
+        BigInteger r = x;
+        System.out.println(binExpo.length);
+        for(int i = 0; i<binExpo.length; i++){
+            //System.out.println(i);
+            r = r.pow(2);
+            r = r.mod(new BigInteger(String.valueOf(n)));
+            if(binExpo[i] == 1){
+                //r = r.multiply(x.mod(new BigInteger(String.valueOf(n))));
+                r = r.mod(new BigInteger(String.valueOf(n)));
+               r = r.modPow(r.multiply(x), new BigInteger(String.valueOf(n)));
+            }
+            //System.out.println("siu " + r.toString());
+        }
+        
+        return r;
+    }
+
     public int inversaPTF(int a) {
         int p = 5;
         // int inversa = ((Math.pow(a, (p-2))%p)%p);
@@ -92,61 +206,18 @@ public class RSA implements ActionListener {
         return p;
     }
 
-    public static void programa() {
-        JFrame f = new JFrame("RSA");// creating instance of JFrame
-
-        JLabel titulo = new JLabel("RSA");
-        // titulo.setSize(new Dimension(5));
-        titulo.setBounds(50, 50, 100, 30);
-        ;
-        f.add(titulo);
-
-        JTextField tx = new JTextField("  ");
-        tx.setBounds(50, 100, 200, 30);
-
-        JButton b = new JButton("click");
-        b.setBounds(130, 100, 100, 50);
-
-        f.add(b);// adding button in JFrame
-        f.add(tx);
-
-        f.setSize(600, 800);
-        f.setLayout(null);// using no layout managers
-        f.setVisible(true);// making the frame visible
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        String s1 = tf1.getText();
-        String s2 = tf2.getText();
-        int a = Integer.parseInt(s1);
-        int b = Integer.parseInt(s2);
-        int c = 0;
-        if (e.getSource() == b1) {
-            // JFileChooser fc = new JFileChooser();
-            // int seleccion=fc.showOpenDialog(new JFrame());
-            System.out.println("OA");
-            
-        }else if(e.getSource()==b2){  
-            c=a-b;  
-        }  
-        String result=String.valueOf(c);  
-        tf3.setText(result);  
-    }  
 
     public static void main(String[] args) {
-        //System.out.println("oa");
-        RSA a = new RSA("hola");
-        //System.out.println(fermat(8));
-        // int portNumber = 4444;
-        // serverSocket = null;
-
-        // try{
-        //     ServerSocket serverSocket = new ServerSocket(portNumber);
-        // }catch (IOException e){
-        //     System.err.println("No se pudo conectar al servidor: " + portNumber);
-        //     System.exit(1);
-        // }
-        //programa();
+        // System.out.println("oa");
+        // RSA a = new RSA("hola");
+         encriptacion(8633, 5, "prueba.txt");
         
+        System.out.println("hola");
+         desencriptacion(5069, 8633,"prueba.txt");
+        // System.out.println((Math.pow(3697, 5069)%8633));
+
+        //System.out.println("value: " + String.valueOf(8633));
+        //System.out.println("oa: " + exponen(new BigInteger("3697"), 5069, 8633).toString());
+       
     }
 }
