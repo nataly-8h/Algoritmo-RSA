@@ -17,25 +17,40 @@ import java.nio.file.StandardOpenOption;
 import java.util.Scanner;
 
 public class RSA {
-    public String name;
-    public long kpub;
-    private long kpr;
 
-    public RSA(String name) {
-        this.name = name;
-        int p = 97;
-        int q = 89;
-        int n = p * q;
-        int phi = (p - 1) * (q - 1);
+    private boolean encriptado;
 
-        int e = 0;
+    //public BigInteger p, q, n, phi, e, d;
+    public int p, q, n, phi, e, d;
+
+    public RSA(int p, int q) {
+
+        // this.p = new BigInteger(String.valueOf(p));
+        // this.q = new BigInteger(String.valueOf(q));
+
+        // this.n = new BigInteger(this.p.multiply(this.q).toString());
+
+        // BigInteger uno = new BigInteger("1");
+        // this.phi = new BigInteger(((this.p.subtract(uno)).multiply(this.q.subtract(uno))).toString()); // (p - 1) * (q - 1)
+        this.p = 97;
+        this.q = 89;
+        this.n = p * q;
+        this.phi = (p - 1) * (q - 1);
+        
+        this.phi = (p - 1) * (q - 1);
+
+        this.e = 0;
         for (int i = 2; i < phi / 2; i++) {
             if (phi % i != 0) {
                 e = i;
                 break;
             }
         }
-        int d = modInverse(e, phi);
+        this.d = modInverse(e, phi);
+    }
+
+    public boolean isEncriptado(){
+        return encriptado;
     }
 
     public static int modInverse(int a, int m) {
@@ -62,128 +77,10 @@ public class RSA {
         return x;
     }
 
-    public static void encriptacion(int n, int e, String doc) {
-        try {
-            PrintWriter writer = new PrintWriter("encryp", "UTF-8");
-            BufferedReader br = new BufferedReader(new FileReader(doc));
-            String linea = br.readLine();
-            String[] message;
-            while (linea != null) {
-                message = linea.split("");
-                if (message.length > 0) {
-                    String encryp = "";
-                    for (int i = 0; i < message.length; i++) {
-                        int x = (int) message[i].charAt(0);
-                        int y = (int) (Math.pow(x, e) % n);
-                        encryp = encryp + y + " ";
-                    }
-                    writer.println(encryp);
-                    linea = br.readLine();
-                    System.out.println();
-                }
-            }
-            br.close();
-            writer.close();
-
-            //////// editar documento
-            Writer a = new FileWriter(doc, false);
-            BufferedReader br2 = new BufferedReader(new FileReader("encryp"));
-            String linea2 = br2.readLine();
-            while (linea2 != null) {
-                a.append(linea2);
-                linea2 = br2.readLine();
-
-            }
-            br2.close();
-            a.close();
-            System.out.println("Encriptado");
-
-            File delTemp = new File("encryp");
-            delTemp.delete();
-
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public static void desencriptacion(int d, int n, String doc) {
-        try {
-            PrintWriter writer = new PrintWriter("descifraTemp.txt", "UTF-8");
-
-            BufferedReader br = new BufferedReader(new FileReader(doc));
-            String linea = br.readLine();
-            String[] message;
-            while (linea != null) {
-                message = linea.split(" ");
-                String descifraTemp = "";
-                for (int i = 0; i < message.length; i++) {
-
-                    BigInteger y = new BigInteger(message[i]);
-                    y = y.modPow(new BigInteger(String.valueOf(d)), new BigInteger(String.valueOf(n)));
-                    descifraTemp = descifraTemp + (char) (Integer.parseInt(y.toString()));
-                }
-                writer.println(descifraTemp);
-                linea = br.readLine();
-
-            }
-            // System.out.println(libreria.toString());
-            br.close();
-            writer.close();
-
-            //////// editar documento
-            Writer a = new FileWriter(doc, false);
-            BufferedReader br2 = new BufferedReader(new FileReader("descifraTemp.txt"));
-            String linea2 = br2.readLine();
-            while (linea2 != null) {
-                a.append(linea2);
-                // System.out.println(linea2);
-                linea2 = br2.readLine();
-
-            }
-            br2.close();
-            a.close();
-            System.out.println("Desencriptado");
-
-            File delTemp = new File("descifraTemp.txt");
-            delTemp.delete();
-
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public static BigInteger exponen(BigInteger x, int d, int n) {
-        BigInteger di = new BigInteger(String.valueOf(d));
-        String[] binary = di.toString(2).split("");
-        int[] binExpo = new int[binary.length];
-
-        for (int i = 0; i < binExpo.length; i++) {
-            binExpo[i] = Integer.parseInt(binary[i]);
-        }
-
-        BigInteger r = x;
-        System.out.println(binExpo.length);
-        for (int i = 0; i < binExpo.length; i++) {
-            // System.out.println(i);
-            r = r.pow(2);
-            r = r.mod(new BigInteger(String.valueOf(n)));
-            if (binExpo[i] == 1) {
-                // r = r.multiply(x.mod(new BigInteger(String.valueOf(n))));
-                r = r.mod(new BigInteger(String.valueOf(n)));
-                r = r.modPow(r.multiply(x), new BigInteger(String.valueOf(n)));
-            }
-            // System.out.println("siu " + r.toString());
-        }
-
-        return r;
-    }
+    
 
     public static void main(String[] args) {
-        encriptacion(8633, 5, "cat.jpg");
+        //encriptacion(8633, 5, "cat.jpg");
 
         // desencriptacion(5069, 8633,"prueba.txt");
 
