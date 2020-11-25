@@ -1,88 +1,85 @@
-
-import javax.swing.*;
-import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.Scanner;
 
 public class RSA {
 
-    private boolean encriptado;
+    public BigInteger p, q, n, phi, e, d;
+    // public int p, q, n, phi, e, d;
 
-    //public BigInteger p, q, n, phi, e, d;
-    public int p, q, n, phi, e, d;
+    public RSA() {
 
-    public RSA(int p, int q) {
+        // this.p = new BigInteger("170141183460469231731687303715884105727");
+        // this.q = new BigInteger("20988936657440586486151264256610222593863921");
 
-        // this.p = new BigInteger(String.valueOf(p));
-        // this.q = new BigInteger(String.valueOf(q));
+        this.p = new BigInteger("97");
+        this.q = new BigInteger("89");
 
-        // this.n = new BigInteger(this.p.multiply(this.q).toString());
+        this.n = new BigInteger(this.p.multiply(this.q).toString());
 
-        // BigInteger uno = new BigInteger("1");
-        // this.phi = new BigInteger(((this.p.subtract(uno)).multiply(this.q.subtract(uno))).toString()); // (p - 1) * (q - 1)
-        this.p = 97;
-        this.q = 89;
-        this.n = p * q;
-        this.phi = (p - 1) * (q - 1);
-        
-        this.phi = (p - 1) * (q - 1);
+        this.phi = new BigInteger(
+                ((this.p.subtract(BigInteger.ONE)).multiply(this.q.subtract(BigInteger.ONE))).toString());// (p - 1) *
+                                                                                                          // (q - 1)
 
-        this.e = 0;
-        for (int i = 2; i < phi / 2; i++) {
-            if (phi % i != 0) {
-                e = i;
+        // this.p = 97;
+        // this.q = 89;
+        // this.n = p * q;
+        // this.phi = (p - 1) * (q - 1);
+
+        this.e = new BigInteger("0");
+
+        BigInteger phiMedio = phi.divide(BigInteger.TWO);
+        System.out.println(phiMedio.toString());
+        System.out.println();
+
+        for(BigInteger i = BigInteger.TWO; i.compareTo(phiMedio) < 0; i = i.add(BigInteger.ONE)){
+            if(this.phi.mod(i).compareTo(BigInteger.ZERO) != 0){
+                this.e = i;
                 break;
             }
         }
+
         this.d = modInverse(e, phi);
+
+        System.out.println(
+                "BIG - n: " + this.n.toString() + " | phi: " + this.phi.toString() + " | e: " + this.e.toString() + " | d: " + this.d.toString());
     }
 
-    public boolean isEncriptado(){
-        return encriptado;
-    }
+    public static BigInteger modInverse(BigInteger a, BigInteger m) {
+        BigInteger mx = m;
+        BigInteger y = BigInteger.ZERO, x = BigInteger.ONE;
 
-    public static int modInverse(int a, int m) {
-        int mx = m;
-        int y = 0, x = 1;
-
-        if (m == 1) {
-            return 0;
+        if (m.equals(BigInteger.ONE)) {
+            return BigInteger.ZERO;
         }
 
-        while (a > 1) {
-            int q = a / m;
-            int t = m;
-            m = a % m;
+        while (a.compareTo(BigInteger.ONE) > 0) {
+            BigInteger q = a.divide(m);
+            BigInteger t = m;
+            m = a.mod(m);
             a = t;
             t = y;
-            y = x - q * y;
+            y = x.subtract(q.multiply(y));
             x = t;
         }
 
-        if (x < 0) {
-            x += mx;
+        if (x.compareTo(BigInteger.ZERO) < 0) {
+            x = x.add(mx);
         }
         return x;
     }
 
-    
-
     public static void main(String[] args) {
-        //encriptacion(8633, 5, "cat.jpg");
+        RSA a = new RSA();
+        // System.out.println(("1").compareTo("2"));
 
-        // desencriptacion(5069, 8633,"prueba.txt");
+        // for (BigInteger i = BigInteger.valueOf(0); i.compareTo(BigInteger.TEN) < 0; i.add(BigInteger.ONE)) {
+        //     System.out.println(i.toString());
+        // }
+
+        // for (BigInteger bi = BigInteger.valueOf(5); bi.compareTo(BigInteger.ZERO) >
+        // 0; bi = bi.subtract(BigInteger.ONE)) {
+
+        // System.out.println(bi);
+        // }
 
     }
 }

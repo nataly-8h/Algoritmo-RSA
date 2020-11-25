@@ -25,7 +25,7 @@ public class VentanaRSA extends JPanel implements ActionListener {
         this.archivo = null;
         this.files = new HashMap<File, Boolean>();
         this.password = "1234";
-        this.rsa = new RSA(97, 89);
+        this.rsa = new RSA();
 
         log = new JTextArea(2,5);
         log.setMargin(new Insets(5,5,5,5));
@@ -139,7 +139,7 @@ public class VentanaRSA extends JPanel implements ActionListener {
                     String input = JOptionPane.showInputDialog(this, "Ingrese la contraseña");
                     if(this.password.equals(input)){
                         desencriptacion(this.rsa.d, this.rsa.n, this.archivo.getPath());
-                        this.files.replace(this.archivo, true);
+                        this.files.replace(this.archivo, false);
                         JOptionPane.showMessageDialog(this, "Desencriptado", null, JOptionPane.PLAIN_MESSAGE);
                     }else{
                         JOptionPane.showMessageDialog(this, "Contraseña incorrecta", null, JOptionPane.WARNING_MESSAGE);
@@ -150,7 +150,7 @@ public class VentanaRSA extends JPanel implements ActionListener {
         }
     }
 
-    public static void encriptacion(int n, int e, String doc) {
+    public static void encriptacion(BigInteger n, BigInteger e, String doc) {
         try {
             PrintWriter writer = new PrintWriter("encryp", "UTF-8");
             BufferedReader br = new BufferedReader(new FileReader(doc));
@@ -161,9 +161,11 @@ public class VentanaRSA extends JPanel implements ActionListener {
                 if (message.length > 0) {
                     String encryp = "";
                     for (int i = 0; i < message.length; i++) {
-                        int x = (int) message[i].charAt(0);
-                        int y = (int) (Math.pow(x, e) % n);
-                        encryp = encryp + y + " ";
+                        // int x = (int) message[i].charAt(0);
+                        // int y = (int) (Math.pow(x, e) % n);
+
+                        BigInteger y = BigInteger.valueOf((int) message[i].charAt(0)).modPow(e, n);
+                        encryp = encryp + y.toString() + " ";
                     }
                     writer.println(encryp);
                     linea = br.readLine();
@@ -196,7 +198,7 @@ public class VentanaRSA extends JPanel implements ActionListener {
         }
     }
 
-    public static void desencriptacion(int d, int n, String doc) {
+    public static void desencriptacion(BigInteger d, BigInteger n, String doc) {
         try {
             PrintWriter writer = new PrintWriter("descifraTemp.txt", "UTF-8");
 
