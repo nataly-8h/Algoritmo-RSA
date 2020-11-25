@@ -31,7 +31,6 @@ public class VentanaRSA extends JPanel implements ActionListener {
         log.setMargin(new Insets(5,5,5,5));
         log.append("Archivo seleccionado: ");
         log.setEditable(false);
-        JScrollPane logScrollPane = new JScrollPane(log);
 
         fc = new JFileChooser();
         String direc = System.getProperty("user.dir") + "/archivos";
@@ -58,11 +57,6 @@ public class VentanaRSA extends JPanel implements ActionListener {
         JPanel archPanel = new JPanel();
         archSelec = new JLabel("Archivo seleccionado: ", JLabel.CENTER);
         archPanel.add(archSelec);
-        //archPanel.setverticalA
-        // JLabel password = new JLabel("Contraseña");
-        // passw = new JTextField("                  ");
-        // archPanel.add(password);
-        // archPanel.add(passw);
 
         JPanel cipherPanel = new JPanel();
         cipherPanel.add(openButton);
@@ -161,8 +155,6 @@ public class VentanaRSA extends JPanel implements ActionListener {
                 if (message.length > 0) {
                     String encryp = "";
                     for (int i = 0; i < message.length; i++) {
-                        // int x = (int) message[i].charAt(0);
-                        // int y = (int) (Math.pow(x, e) % n);
 
                         BigInteger y = BigInteger.valueOf((int) message[i].charAt(0)).modPow(e, n);
                         encryp = encryp + y.toString() + " ";
@@ -266,7 +258,7 @@ public class VentanaRSA extends JPanel implements ActionListener {
                 r = r.mod(new BigInteger(String.valueOf(n)));
                 r = r.modPow(r.multiply(x), new BigInteger(String.valueOf(n)));
             }
-            // System.out.println("siu " + r.toString());
+
         }
 
         return r;
@@ -288,11 +280,9 @@ public class VentanaRSA extends JPanel implements ActionListener {
     }
 
     public static void main(String[] args) {
-        //Schedule a job for the event dispatch thread:
-        //creating and showing this application's GUI.
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                //Turn off metal's use of bold fonts
                 UIManager.put("swing.boldMetal", Boolean.FALSE); 
                 createAndShowGUI();
             }

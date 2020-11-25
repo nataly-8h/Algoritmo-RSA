@@ -7,11 +7,8 @@ public class RSA {
 
     public RSA() {
 
-        // this.p = new BigInteger("170141183460469231731687303715884105727");
-        // this.q = new BigInteger("20988936657440586486151264256610222593863921");
-
-        this.p = new BigInteger("97");
-        this.q = new BigInteger("89");
+        this.p = new BigInteger("170141183460469231731687303715884105727");
+        this.q = new BigInteger("20988936657440586486151264256610222593863921");
 
         this.n = new BigInteger(this.p.multiply(this.q).toString());
 
