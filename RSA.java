@@ -16,12 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Scanner;
 
-
 public class RSA {
     public String name;
     public long kpub;
     private long kpr;
-
 
     public RSA(String name) {
         this.name = name;
@@ -37,16 +35,7 @@ public class RSA {
                 break;
             }
         }
-        // System.out.println(e%phi);
         int d = modInverse(e, phi);
-        //System.out.println(modInverse(a, m));
-        // System.out.println(d);
-
-        // System.out.print("Que archivo desea leer? ");
-        // Scanner in = new Scanner(System.in); 
-        // String s = in.nextLine(); 
-        //String archivo = reader.readLine();
-        System.out.println("n" + n + " e " + e + " d " +d);
     }
 
     public static int modInverse(int a, int m) {
@@ -73,99 +62,93 @@ public class RSA {
         return x;
     }
 
-    public static void encriptacion(int n, int e, String doc){
-        //System.out.println("hola");
-        try{
+    public static void encriptacion(int n, int e, String doc) {
+        try {
             PrintWriter writer = new PrintWriter("encryp", "UTF-8");
-            BufferedReader br=new BufferedReader(new FileReader(doc));
-            String linea=br.readLine();
+            BufferedReader br = new BufferedReader(new FileReader(doc));
+            String linea = br.readLine();
             String[] message;
-            while (linea!=null){
-                System.out.println(linea);
-                message=linea.split("");
-                String encryp = "";
-                for(int i = 0; i<message.length; i++){
-                    //System.out.println(message[i]);
-                    int x = (int)message[i].charAt(0);
-                    int y = (int)(Math.pow(x, e)%n);
-                    System.out.println("encifer: " + message[i] + "  x: " + x + " y: " + y);
-                    encryp = encryp + y + " ";
+            while (linea != null) {
+                message = linea.split("");
+                if (message.length > 0) {
+                    String encryp = "";
+                    for (int i = 0; i < message.length; i++) {
+                        int x = (int) message[i].charAt(0);
+                        int y = (int) (Math.pow(x, e) % n);
+                        encryp = encryp + y + " ";
+                    }
+                    writer.println(encryp);
+                    linea = br.readLine();
+                    System.out.println();
                 }
-                writer.println(encryp);
-                linea=br.readLine();
-                System.out.println();
             }
             br.close();
             writer.close();
 
             //////// editar documento
             Writer a = new FileWriter(doc, false);
-            BufferedReader br2=new BufferedReader(new FileReader("encryp"));
-            String linea2=br2.readLine();
-            while (linea2!=null){
+            BufferedReader br2 = new BufferedReader(new FileReader("encryp"));
+            String linea2 = br2.readLine();
+            while (linea2 != null) {
                 a.append(linea2);
-                //System.out.println(linea2);
-                linea2=br2.readLine();
+                linea2 = br2.readLine();
 
             }
             br2.close();
             a.close();
             System.out.println("Encriptado");
-            
+
             File delTemp = new File("encryp");
             delTemp.delete();
 
-
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
-        } 
+        }
     }
 
-    public static void desencriptacion(int d, int n, String doc){
-        try{
+    public static void desencriptacion(int d, int n, String doc) {
+        try {
             PrintWriter writer = new PrintWriter("descifraTemp.txt", "UTF-8");
-            
-            BufferedReader br=new BufferedReader(new FileReader(doc));
-            String linea=br.readLine();
+
+            BufferedReader br = new BufferedReader(new FileReader(doc));
+            String linea = br.readLine();
             String[] message;
-            while (linea!=null){
-                message=linea.split(" ");
+            while (linea != null) {
+                message = linea.split(" ");
                 String descifraTemp = "";
-                for(int i = 0; i<message.length; i++){
-                    
+                for (int i = 0; i < message.length; i++) {
+
                     BigInteger y = new BigInteger(message[i]);
                     y = y.modPow(new BigInteger(String.valueOf(d)), new BigInteger(String.valueOf(n)));
-                    descifraTemp = descifraTemp + (char)(Integer.parseInt(y.toString()));
+                    descifraTemp = descifraTemp + (char) (Integer.parseInt(y.toString()));
                 }
                 writer.println(descifraTemp);
-                linea=br.readLine();
+                linea = br.readLine();
 
             }
-            //System.out.println(libreria.toString());
+            // System.out.println(libreria.toString());
             br.close();
             writer.close();
 
-            //////
-
             //////// editar documento
-            // Writer a = new FileWriter(doc, false);
-            // BufferedReader br2=new BufferedReader(new FileReader("descifraTemp"));
-            // String linea2=br2.readLine();
-            // while (linea2!=null){
-            //     a.append(linea2);
-            //     //System.out.println(linea2);
-            //     linea2=br2.readLine();
+            Writer a = new FileWriter(doc, false);
+            BufferedReader br2 = new BufferedReader(new FileReader("descifraTemp.txt"));
+            String linea2 = br2.readLine();
+            while (linea2 != null) {
+                a.append(linea2);
+                // System.out.println(linea2);
+                linea2 = br2.readLine();
 
-            // }
-            // br2.close();
-            // a.close();
-            // System.out.println("Desencriptado");
-            
-            // File delTemp = new File("descifraTemp");
-            // delTemp.delete();
-            
+            }
+            br2.close();
+            a.close();
+            System.out.println("Desencriptado");
+
+            File delTemp = new File("descifraTemp.txt");
+            delTemp.delete();
+
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
@@ -173,51 +156,36 @@ public class RSA {
         }
     }
 
-    public static BigInteger exponen(BigInteger x, int d, int n){
+    public static BigInteger exponen(BigInteger x, int d, int n) {
         BigInteger di = new BigInteger(String.valueOf(d));
         String[] binary = di.toString(2).split("");
         int[] binExpo = new int[binary.length];
-        
-        for(int i = 0; i<binExpo.length; i++){
+
+        for (int i = 0; i < binExpo.length; i++) {
             binExpo[i] = Integer.parseInt(binary[i]);
         }
-        
+
         BigInteger r = x;
         System.out.println(binExpo.length);
-        for(int i = 0; i<binExpo.length; i++){
-            //System.out.println(i);
+        for (int i = 0; i < binExpo.length; i++) {
+            // System.out.println(i);
             r = r.pow(2);
             r = r.mod(new BigInteger(String.valueOf(n)));
-            if(binExpo[i] == 1){
-                //r = r.multiply(x.mod(new BigInteger(String.valueOf(n))));
+            if (binExpo[i] == 1) {
+                // r = r.multiply(x.mod(new BigInteger(String.valueOf(n))));
                 r = r.mod(new BigInteger(String.valueOf(n)));
-               r = r.modPow(r.multiply(x), new BigInteger(String.valueOf(n)));
+                r = r.modPow(r.multiply(x), new BigInteger(String.valueOf(n)));
             }
-            //System.out.println("siu " + r.toString());
+            // System.out.println("siu " + r.toString());
         }
-        
+
         return r;
     }
 
-    public int inversaPTF(int a) {
-        int p = 5;
-        // int inversa = ((Math.pow(a, (p-2))%p)%p);
-
-        return p;
-    }
-
-
     public static void main(String[] args) {
-        // System.out.println("oa");
-        // RSA a = new RSA("hola");
-         encriptacion(8633, 5, "prueba.txt");
-        
-        System.out.println("hola");
-         desencriptacion(5069, 8633,"prueba.txt");
-        // System.out.println((Math.pow(3697, 5069)%8633));
+        encriptacion(8633, 5, "cat.jpg");
 
-        //System.out.println("value: " + String.valueOf(8633));
-        //System.out.println("oa: " + exponen(new BigInteger("3697"), 5069, 8633).toString());
-       
+        // desencriptacion(5069, 8633,"prueba.txt");
+
     }
 }

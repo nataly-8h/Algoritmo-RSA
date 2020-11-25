@@ -1,8 +1,6 @@
 
 import javax.swing.*;
 
-//import sun.jvm.hotspot.tools.SysPropsDumper;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
